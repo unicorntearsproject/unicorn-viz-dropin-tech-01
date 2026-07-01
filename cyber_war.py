@@ -119,7 +119,7 @@ void main() {
 class CyberWar(BaseEffect):
     NAME = "Cyber War"
     AUTHOR = "Autopilot"
-    TAGS = ["futuristic", "audio", "network", "cyberpunk"]
+    TAGS = ["tech", "futuristic", "network", "cyberpunk"]
     PING_PONG_FRIENDS = [
         'Tron Grid',
         'Hacker Terminal',

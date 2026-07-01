@@ -231,7 +231,7 @@ class HackerTerminal2(BaseEffect):
 
     NAME   = 'Hacker Terminal 2.0'
     AUTHOR = 'unicorn-viz'
-    TAGS   = ['cyberpunk', 'audio', 'tech', 'glitch', 'text']
+    TAGS = ['tech', 'cyberpunk', 'glitch', 'text']
     PING_PONG_FRIENDS = ['Tron Grid', 'Cyber War', 'Hacker Terminal']
 
     def _init(self) -> None:
