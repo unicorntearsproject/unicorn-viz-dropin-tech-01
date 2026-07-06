@@ -167,7 +167,7 @@ void main() {
 class ThreatMatrix(BaseEffect):
     NAME = "Threat Matrix"
     AUTHOR = "unicorn-viz"
-    TAGS = ["tech", "cyberpunk", "hacker", "network", "matrix"]
+    TAGS = ['tech', 'cyberpunk', 'hacker', 'network', 'matrix', 'hard']
     PING_PONG_FRIENDS = [
         # Tech neighbours
         'Cyber War',

@@ -247,7 +247,7 @@ class TronGrid(BaseEffect):
 
     NAME = 'Tron Grid'
     AUTHOR = 'unicorn-viz drop-in'
-    TAGS = ['tech', 'tron', 'laser', 'grid', 'raymarching', 'neon', 'sci-fi']
+    TAGS = ['tech', 'tron', 'laser', 'grid', 'raymarching', 'neon', 'sci-fi', 'intense']
     PING_PONG_FRIENDS = [
         'Hacker Terminal',
         'Cyber War',

@@ -103,7 +103,7 @@ void main() {
 class HackerTerminal(BaseEffect):
     NAME = "Hacker Terminal"
     AUTHOR = "Autopilot"
-    TAGS = ["tech", "cyberpunk", "glitch"]
+    TAGS = ['tech', 'cyberpunk', 'glitch', 'energetic', 'intense']
     PING_PONG_FRIENDS = ['Tron Grid', 'Cyber War']
 
     def _init(self) -> None:
