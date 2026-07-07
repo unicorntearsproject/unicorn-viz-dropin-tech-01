@@ -183,7 +183,7 @@ void main() {
 class ReactorBreach(BaseEffect):
     NAME = "Reactor Breach"
     AUTHOR = "unicorn-viz"
-    TAGS = ['tech', 'industrial', 'meltdown', 'plasma', 'intense', 'hard']
+    TAGS = ['tech', 'plasma', 'feature', 'intense', 'hard']
     PING_PONG_FRIENDS = [
         # Tech neighbours
         'Threat Matrix',
