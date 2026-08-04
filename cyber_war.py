@@ -153,23 +153,24 @@ class CyberWar(BaseEffect):
         self._treble = 0.0
 
     def _create_node_texture(self) -> moderngl.Texture:
-        """Generate a procedural network node map texture."""
+        """Generate a procedural network node map texture.
+
+        Uses ``self.rng`` per the effect-randomization rules: the node board
+        was previously byte-identical every run (``np.random.seed(42)``),
+        and the global reseed silently de-randomized every other legacy
+        ``np.random`` consumer in the process.
+        """
         w, h = 256, 256
         data = np.zeros((h, w, 3), dtype=np.uint8)
-        
-        np.random.seed(42)  # Deterministic
+
         node_count = int(w * h * self.parameters["node_density"] / 1000)
-        
-        for _ in range(node_count):
-            x = np.random.randint(0, w)
-            y = np.random.randint(0, h)
-            is_attack = np.random.rand() > 0.5
-            
-            if is_attack:
-                data[y, x] = [200, 50, 30]  # Red/orange attack node
-            else:
-                data[y, x] = [30, 100, 200]  # Blue defense node
-        
+        xs = self.rng.integers(0, w, size=node_count)
+        ys = self.rng.integers(0, h, size=node_count)
+        attacks = self.rng.random(node_count) > 0.5
+
+        data[ys[attacks], xs[attacks]] = [200, 50, 30]   # Red/orange attack node
+        data[ys[~attacks], xs[~attacks]] = [30, 100, 200]  # Blue defense node
+
         tex = self.ctx.texture((w, h), 3, data.tobytes())
         tex.filter = moderngl.LINEAR, moderngl.LINEAR
         return tex
