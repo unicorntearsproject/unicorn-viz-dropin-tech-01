@@ -15,7 +15,7 @@ Audio reactivity:
 """
 from __future__ import annotations
 
-__version__ = '0.9.1'
+__version__ = '0.10.0'
 
 import math
 import random
@@ -124,8 +124,11 @@ void main() {
     vec2 uv = v_uv;
     uv = (uv - 0.5) / max(iZoom, 0.1) + 0.5;
 
-    // Beat-driven row glitch: shift a band of rows horizontally
-    float glitch_row = hash(vec2(floor(iTime * 8.0), 0.0));
+    // Beat-driven row glitch: shift a band of rows horizontally.
+    // mod() before the hash: floor(iTime*8) * 127.1 exceeds 2^23 past
+    // iTime ~8k (start phase reaches 10k), freezing the glitch row at a
+    // fixed position for the whole session.
+    float glitch_row = hash(vec2(floor(mod(iTime, 512.0) * 8.0), 0.0));
     float row_band = abs(uv.y - glitch_row);
     float gshift = iGlitchAmt * iBeat * smoothstep(0.08, 0.0, row_band);
     uv.x = fract(uv.x + gshift * 0.045);
@@ -154,7 +157,8 @@ void main() {
 
     // Brightness: scanline × per-column flicker × treble sparkle
     float flicker = iFlicker[col_i];
-    float sparkle = 1.0 + iTreble * 0.35 * hash(vec2(col_f, iTime * 4.0));
+    // mod() for the same 2^23 reason as glitch_row above (×311.7 here).
+    float sparkle = 1.0 + iTreble * 0.35 * hash(vec2(col_f, mod(iTime, 1024.0) * 4.0));
     float brightness = glyph_sample * scanline(uv.y, iTime) * flicker * sparkle;
 
     // CRT bloom: soft glow around bright pixels
@@ -262,6 +266,7 @@ class HackerTerminal2(BaseEffect):
 
         # Glyph buffer: ROWS × COLS of codepoints
         self._glyphs = np.full((_TERM_ROWS, _TERM_COLS), 0x20, dtype=np.int32)
+        self._glyphs_dirty = True
 
         # Text line buffer
         self._rng_py = random.Random(int(self.rng.integers(0, 2**31)))
@@ -313,6 +318,7 @@ class HackerTerminal2(BaseEffect):
         for r, line in enumerate(self._lines[-_TERM_ROWS:]):
             row = _text_to_glyphs(line, _TERM_COLS)
             self._glyphs[r] = row
+        self._glyphs_dirty = True
 
     # ------------------------------------------------------------------
 
@@ -384,7 +390,12 @@ class HackerTerminal2(BaseEffect):
         _set('iGlitchAmt', self._glitch_amt)
         _set('iScrollY', tuple(float(v) for v in self._scroll_y))
         _set('iFlicker', tuple(float(v) for v in self._flicker))
-        _set('iGlyphs', tuple(int(v) for v in self._glyphs.flatten()))
+        # Glyph content only changes on beat/drip (_flush_glyphs); the
+        # unconditional upload boxed ~2,500 Python objects per frame for a
+        # mostly-static 2,400-int array.
+        if self._glyphs_dirty:
+            _set('iGlyphs', tuple(int(v) for v in self._glyphs.flatten()))
+            self._glyphs_dirty = False
         self._vao.render(moderngl.TRIANGLE_STRIP)
 
     def destroy(self) -> None:

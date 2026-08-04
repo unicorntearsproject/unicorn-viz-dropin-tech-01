@@ -136,7 +136,11 @@ vec3 scene(vec2 uv, float t, float aspect) {
     col = mix(col, vec3(1.0, 0.2, 0.08), ring * iWave * 0.35 * iStrobeGain);
 
     // --- rising sparks ---
-    vec2 sc = vec2(ang * 3.0, r * 5.0 - t * 2.2);
+    // mod() the time term pre-hash: t*2.2*8 reaches ~2.3e5 (t starts up to
+    // ~10k) and hash21's *456.21 blows past 2^23 — the sparks froze into
+    // static angular noise from frame 0. 256 s wrap = seamless (the field
+    // scrolls continuously through the wrap).
+    vec2 sc = vec2(ang * 3.0, r * 5.0 - mod(t, 256.0) * 2.2);
     float spark = step(0.985 - iTreble * 0.012, hash21(floor(sc * 8.0)));
     col += hot(0.95) * spark * smoothstep(coreR, coreR + 0.4, r) * (0.4 + iTreble);
 

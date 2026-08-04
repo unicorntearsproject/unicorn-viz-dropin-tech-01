@@ -89,7 +89,12 @@ vec3 scene(vec2 uv, float t, float aspect) {
     vec2 rc = floor(vec2(ar.x * 40.0, ar.y * 24.0));
     float stream = fract(uv.y * 24.0 + t * (0.6 + hash11(rc.x) * 1.8) + hash11(rc.x) * 10.0);
     float head = smoothstep(0.0, 0.08, stream) * smoothstep(0.6, 0.08, stream);
-    float gl = glyph(fract(vec2(ar.x * 40.0, ar.y * 24.0)), rc.x + floor(t * 8.0 + rc.y));
+    // mod() the time term BEFORE it reaches the hash: floor(t*8) grows to
+    // ~1e5 (t starts up to ~13k), and hash21's *456.21 then exceeds float32's
+    // 2^23 mantissa — fract() returned exactly 0 and the whole rain layer
+    // rendered black from frame 0. 512 keeps the hash input well inside
+    // precision (64 s repeat, imperceptible for a glyph shuffle).
+    float gl = glyph(fract(vec2(ar.x * 40.0, ar.y * 24.0)), rc.x + floor(mod(t * 8.0, 512.0) + rc.y));
     col += vec3(0.05, 0.55, 0.18) * gl * head * (0.2 + iTreble * 0.7) * iRain;
 
     // --- threat heat grid ---
