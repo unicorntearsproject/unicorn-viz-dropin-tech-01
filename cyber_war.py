@@ -5,7 +5,6 @@ with audio-driven pulse waves and frequency-mapped node intensity.
 """
 from __future__ import annotations
 
-import math
 import numpy as np
 import moderngl
 

@@ -289,7 +289,6 @@ class HackerTerminal2(BaseEffect):
 
     def _load_font(self) -> moderngl.Texture:
         """Load font8x16 atlas from assets or fall back to a white 128×128 texture."""
-        import struct
         from pathlib import Path
 
         candidates = [

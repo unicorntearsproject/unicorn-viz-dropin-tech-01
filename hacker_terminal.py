@@ -5,9 +5,7 @@ and beat-driven glitch effects.
 """
 from __future__ import annotations
 
-import math
 import random
-import numpy as np
 import moderngl
 
 from unicornviz.effects.base import BaseEffect, AudioData
