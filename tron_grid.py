@@ -52,7 +52,7 @@ out vec4  fragColor;
 
 #define PI  3.14159265
 #define TAU 6.28318530
-#define MAX_STEPS 64
+uniform int   iSteps;
 #define NEAR 0.001
 #define FAR  60.0
 
@@ -104,7 +104,7 @@ vec3 sceneNormal(vec3 p) {
 // ── ray-march ─────────────────────────────────────────────────────────────────
 float march(vec3 ro, vec3 rd, out float tHit) {
     float t = NEAR;
-    for (int i = 0; i < MAX_STEPS; i++) {
+    for (int i = 0; i < iSteps; i++) {
         float d = sceneDist(ro + rd * t);
         if (d < 0.001) { tHit = t; return 1.0; }
         t += max(d * 0.6, 0.002);
@@ -266,6 +266,8 @@ class TronGrid(BaseEffect):
             'num_beams':  float(self.config.get('num_beams',  6)),
             'grid_scale': float(self.config.get('grid_scale', 1.0)),
             'zoom': float(self.config.get('zoom', 1.0)),
+            # Ray-march budget: the config editor's Effects tab pins it live.
+            'march_steps': float(self.config.get('march_steps', 64)),
         }
         self._flare = str(self.config.get('flare', 'true')).lower() != 'false'
 
@@ -303,6 +305,7 @@ class TronGrid(BaseEffect):
         self._set('iNumBeams',   max(2.0, self.parameters['num_beams']))
         self._set('iGridScale',  max(0.2, self.parameters['grid_scale']))
         self._set('iZoom',       max(0.1, self.parameters['zoom']))
+        self._set('iSteps',      int(max(8, min(256, self.parameters['march_steps']))))
         self._vao.render(moderngl.TRIANGLE_STRIP)
 
     def destroy(self) -> None:
